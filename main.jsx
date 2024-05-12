@@ -1,19 +1,14 @@
-import React, { useState, useEffect } from 'react';
+let genQuote=document.querySelector("#new-quote");
+let tweetBut=document.querySelector("#tweet-quote");
+let content=document.querySelector("#text");
+let author=document.querySelector("#author");
 
-const QuoteBox = () => {
-  const [quote, setQuote] = useState('');
-  const [author, setAuthor] = useState('');
 
-  useEffect(() => {
-    fetchQuote();
-  }, []);
-
-  const fetchQuote = async () => {
+const fetchQuote = async () => {
     try {
       const response = await fetch('https://api.quotable.io/random');
       const data = await response.json();
-      setQuote(data.content);
-      setAuthor(data.author);
+      return data;
     } catch (error) {
       console.error('Error fetching quote:', error);
     }
@@ -32,9 +27,10 @@ const QuoteBox = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          text: `"${quote}" - ${author}`
+          text: `"${content.innerText}" - ${author.innerText}`
         })
       });
+
       if (!response.ok) {
         throw new Error('Failed to quote tweet');
       }
@@ -44,18 +40,20 @@ const QuoteBox = () => {
     }
   };
 
-  return (
-    <div id="quote-box">
-      <p id="text">{quote}</p>
-      <p id="author">- {author}</p>
-      <button id="new-quote" onClick={handleNewQuote}>
-        New Quote
-      </button>
-      <button id="tweet-quote" onClick={handleTweetQuote}>
-        Tweet Quote
-      </button>
-    </div>
-  );
-};
 
-export default QuoteBox;
+
+async function writter(data){
+  let getter=new Promise((resolve,reject)=>{
+      if(data != undefined){
+        resolve(content.textContent=data.content);
+        resolve(author.textContent=data.author);
+      }
+    })
+  };
+
+
+
+genQuote.addEventListener("click",async ()=>{
+  const data=await fetchQuote();
+  writter(data);
+});
